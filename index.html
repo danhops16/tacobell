@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taco Bell Tracker</title>
+  <meta name="description" content="Track every Taco Bell location you've visited around the world.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="bell">🔔</span>
+        <div>
+          <h1>Taco Bell Tracker</h1>
+          <p class="tagline">Live más — one location at a time</p>
+        </div>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat">
+          <span class="stat-value" id="visited-count">0</span>
+          <span class="stat-label">Visited</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="total-count">—</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="percent-count">0%</span>
+          <span class="stat-label">Complete</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="sidebar">
+      <div class="controls">
+        <input type="search" id="search" placeholder="Search city, state, address..." autocomplete="off">
+
+        <div class="filter-row">
+          <select id="country-filter">
+            <option value="">All countries</option>
+          </select>
+          <select id="status-filter">
+            <option value="all">All locations</option>
+            <option value="visited">Visited only</option>
+            <option value="unvisited">Not visited</option>
+          </select>
+        </div>
+
+        <div class="action-row">
+          <button type="button" id="btn-near-me" class="btn btn-secondary">Near me</button>
+          <button type="button" id="btn-export" class="btn btn-secondary" title="Export visited list">Export</button>
+          <label class="btn btn-secondary import-label">
+            Import
+            <input type="file" id="import-file" accept=".json" hidden>
+          </label>
+        </div>
+      </div>
+
+      <div class="list-header">
+        <span id="list-count">Loading...</span>
+      </div>
+      <ul class="location-list" id="location-list"></ul>
+    </aside>
+
+    <section class="map-panel">
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <div class="loading" id="loading">
+    <div class="loading-inner">
+      <span class="bell">🔔</span>
+      <p>Loading Taco Bell locations...</p>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

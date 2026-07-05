@@ -1,0 +1,382 @@
+:root {
+  --purple: #702283;
+  --purple-dark: #4a1558;
+  --purple-light: #9b4dab;
+  --pink: #ff1a75;
+  --yellow: #ffc600;
+  --bg: #1a0a1f;
+  --surface: #2a1530;
+  --surface-hover: #3a2045;
+  --text: #f5f0f7;
+  --text-muted: #b8a0c0;
+  --visited: #4ade80;
+  --border: #4a2d55;
+  --sidebar-width: 380px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.header {
+  background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+  border-bottom: 3px solid var(--pink);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bell {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 8px var(--yellow));
+}
+
+.brand h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  font-size: 0.8rem;
+  color: var(--yellow);
+  font-style: italic;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--yellow);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--purple-dark);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pink), var(--yellow));
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+.main {
+  display: flex;
+  height: calc(100vh - 90px);
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.controls {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+#search {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+#search:focus {
+  outline: none;
+  border-color: var(--pink);
+}
+
+.filter-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-row select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.action-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--purple-light);
+}
+
+.import-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-header {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.location-list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.location-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.location-item:hover {
+  background: var(--surface-hover);
+}
+
+.location-item.active {
+  background: var(--purple-dark);
+  border-left: 3px solid var(--pink);
+}
+
+.location-item.visited .location-name {
+  color: var(--visited);
+}
+
+.visit-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: all 0.15s;
+  font-size: 0.75rem;
+}
+
+.location-item.visited .visit-check {
+  background: var(--visited);
+  border-color: var(--visited);
+  color: #0a1f0a;
+}
+
+.location-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.location-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-address {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.location-meta {
+  font-size: 0.7rem;
+  color: var(--purple-light);
+  margin-top: 2px;
+}
+
+.list-more {
+  padding: 0.75rem;
+  list-style: none;
+}
+
+.list-more .btn {
+  width: 100%;
+}
+
+.map-panel {
+  flex: 1;
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.3s;
+}
+
+.loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-inner {
+  text-align: center;
+}
+
+.loading-inner .bell {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+  animation: ring 1s ease-in-out infinite;
+}
+
+@keyframes ring {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+}
+
+.leaflet-popup-tip {
+  background: var(--surface);
+}
+
+.popup-content h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.popup-content p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.popup-btn {
+  width: 100%;
+  padding: 0.4rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.popup-btn.mark {
+  background: var(--purple);
+  color: white;
+}
+
+.popup-btn.mark.visited {
+  background: var(--visited);
+  color: #0a1f0a;
+}
+
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    max-height: 50vh;
+  }
+
+  .map-panel {
+    height: 50vh;
+  }
+
+  .stats {
+    gap: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+}
