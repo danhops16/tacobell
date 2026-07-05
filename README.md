@@ -4,7 +4,7 @@ A GitHub Pages site to track every Taco Bell location you've visited.
 
 ## Features
 
-- **7,300+ locations** across the United States, Canada, and the United Kingdom
+- **8,900+ locations** across 9 countries (US, Canada, UK, Spain, India, Australia, Finland, Netherlands, Philippines)
 - Interactive map with clustering
 - Search by city, state, or address
 - Filter by country or visited status
@@ -48,10 +48,16 @@ Location data comes from public sources and is bundled in `data/locations.json`.
 python3 scripts/build_locations.py
 ```
 
-Data sources:
-- **US** (~7,100): [stiles/locations](https://github.com/stiles/locations) (MIT)
-- **Canada** (~156): [tacobell.ca](https://www.tacobell.ca/en/store-locator) store locator
-- **UK** (~37): Community-maintained [gist](https://gist.github.com/SteGriff/00ed26790b028c06200d56041e6ba23f)
+Location data comes from [All The Places](https://alltheplaces.xyz/) (CC0), updated weekly. The build script downloads official store data for:
+
+- **United States** (~8,200)
+- **Canada** (~200)
+- **United Kingdom** (~160)
+- **Spain** (~180)
+- **India** (~110)
+- **Australia**, **Finland**, **Netherlands**, **Philippines**
+
+Taco Bell operates in 35+ countries total; this covers every country with a public store-locator API in the All The Places project. More countries can be added as spiders become available.
 
 ## Visited data
 

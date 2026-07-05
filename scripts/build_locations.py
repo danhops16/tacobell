@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build consolidated Taco Bell locations JSON from public data sources."""
+"""Build consolidated Taco Bell locations JSON from All The Places."""
 
-import csv
+import hashlib
 import json
 import re
 import sys
@@ -12,138 +12,177 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "locations.json"
 
-US_CSV_URL = (
-    "https://raw.githubusercontent.com/stiles/locations/main/"
-    "taco-bell/data/processed/taco-bell_locations.csv"
-)
-UK_JSON_URL = (
-    "https://gist.githubusercontent.com/SteGriff/"
-    "00ed26790b028c06200d56041e6ba23f/raw/tacobell-locations.json"
-)
-CA_LOCATOR_URL = "https://www.tacobell.ca/en/store-locator"
+ATP_BASE = "https://data.alltheplaces.xyz/runs/latest/output"
+SPIDERS = [
+    "taco_bell_us",
+    "taco_bell_ca",
+    "taco_bell_gb",
+    "taco_bell_au",
+    "taco_bell_es",
+    "taco_bell_in",
+    "taco_bell_nl",
+    "taco_bell_ph",
+    "taco_bell_fi",
+]
+
+SPIDER_COUNTRY = {
+    "taco_bell_us": "US",
+    "taco_bell_ca": "CA",
+    "taco_bell_gb": "GB",
+    "taco_bell_au": "AU",
+    "taco_bell_es": "ES",
+    "taco_bell_in": "IN",
+    "taco_bell_nl": "NL",
+    "taco_bell_ph": "PH",
+    "taco_bell_fi": "FI",
+}
+
+COUNTRY_NAMES = {
+    "US": "United States",
+    "CA": "Canada",
+    "GB": "United Kingdom",
+    "AU": "Australia",
+    "ES": "Spain",
+    "IN": "India",
+    "NL": "Netherlands",
+    "PH": "Philippines",
+    "FI": "Finland",
+}
 
 
 def fetch(url: str) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": "tacobell-tracker/1.0"})
-    with urllib.request.urlopen(req, timeout=60) as resp:
+    with urllib.request.urlopen(req, timeout=120) as resp:
         return resp.read()
 
 
-def parse_us_locations() -> list[dict]:
-    raw = fetch(US_CSV_URL).decode("utf-8")
-    locations = []
-    for row in csv.DictReader(raw.splitlines()):
-        store_num = row.get("store_num", "").strip()
-        if not store_num:
+def slugify(value: str) -> str:
+    value = re.sub(r"[^a-zA-Z0-9]+", "-", value.strip().lower())
+    return value.strip("-")[:48] or "unknown"
+
+
+def make_id(country: str, ref: str, lat: float, lng: float) -> str:
+    if ref:
+        return f"{country.lower()}-{slugify(ref)}"
+    digest = hashlib.sha1(f"{lat:.5f},{lng:.5f}".encode()).hexdigest()[:10]
+    return f"{country.lower()}-{digest}"
+
+
+def extract_store_num(ref: str, props: dict) -> str:
+    if not ref:
+        return ""
+    if ref.isdigit():
+        return ref
+    match = re.search(r"/(\d{4,6})(?:\.html|#|$)", ref)
+    if match:
+        return match.group(1)
+    match = re.search(r"(\d{4,6})$", ref.strip("/"))
+    if match:
+        return match.group(1)
+    return ref[:24]
+
+
+def feature_to_location(feature: dict) -> dict | None:
+    props = feature.get("properties", {})
+    geometry = feature.get("geometry") or {}
+    coords = geometry.get("coordinates")
+    if not coords or len(coords) < 2:
+        return None
+
+    spider = props.get("@spider", "")
+    country = (
+        props.get("addr:country")
+        or SPIDER_COUNTRY.get(spider)
+        or "XX"
+    )
+    if len(country) > 2:
+        country = {"United States": "US", "Canada": "CA", "Great Britain": "GB"}.get(
+            country, country[:2].upper()
+        )
+
+    lng, lat = float(coords[0]), float(coords[1])
+    ref = str(props.get("ref") or feature.get("id") or "")
+    loc_id = make_id(country, ref, lat, lng)
+
+    address = (
+        props.get("addr:street_address")
+        or props.get("addr:full")
+        or props.get("addr_full")
+        or ""
+    ).strip()
+    if not address and props.get("addr:housenumber") and props.get("addr:street"):
+        address = f"{props['addr:housenumber']} {props['addr:street']}".strip()
+
+    return {
+        "id": loc_id,
+        "storeNum": extract_store_num(ref, props),
+        "name": props.get("name") or props.get("branch") or "Taco Bell",
+        "address": address,
+        "city": (props.get("addr:city") or "").strip(),
+        "state": (props.get("addr:state") or "").strip(),
+        "zip": (props.get("addr:postcode") or "").strip(),
+        "country": country,
+        "lat": lat,
+        "lng": lng,
+        "phone": (props.get("phone") or "").strip(),
+    }
+
+
+def dedupe(locations: list[dict]) -> list[dict]:
+    seen: set[tuple] = set()
+    unique: list[dict] = []
+    for loc in locations:
+        key = (loc["country"], round(loc["lat"], 4), round(loc["lng"], 4))
+        if key in seen:
             continue
-        locations.append(
-            {
-                "id": f"us-{store_num}",
-                "storeNum": store_num,
-                "name": "Taco Bell",
-                "address": row.get("address", "").strip(),
-                "city": row.get("city", "").strip(),
-                "state": row.get("state_abbr", "").strip(),
-                "zip": row.get("zip", "").strip(),
-                "country": "US",
-                "lat": float(row["latitude"]),
-                "lng": float(row["longitude"]),
-                "phone": row.get("phone", "").strip(),
-            }
-        )
-    return locations
+        seen.add(key)
+        unique.append(loc)
+    return unique
 
 
-def parse_uk_locations() -> list[dict]:
-    data = json.loads(fetch(UK_JSON_URL))
-    stores = data.get("data", data)
+def fetch_spider(spider: str) -> list[dict]:
+    url = f"{ATP_BASE}/{spider}.geojson"
+    data = json.loads(fetch(url))
     locations = []
-    for store in stores:
-        store_num = str(store.get("store_number", store.get("id", "")))
-        locations.append(
-            {
-                "id": f"uk-{store_num}",
-                "storeNum": store_num,
-                "name": store.get("name", "Taco Bell"),
-                "address": store.get("address_line_1", "").strip(),
-                "city": store.get("city", "").strip(),
-                "state": store.get("county", "").strip(),
-                "zip": store.get("post_code", "").strip(),
-                "country": "GB",
-                "lat": float(store["latitude"]),
-                "lng": float(store["longitude"]),
-                "phone": store.get("telephone", "").strip(),
-            }
-        )
-    return locations
-
-
-def parse_ca_locations() -> list[dict]:
-    html = fetch(CA_LOCATOR_URL).decode("utf-8")
-    scripts = re.findall(r"<script[^>]*>(.*?)</script>", html, re.DOTALL)
-    page_data = None
-    for script in scripts:
-        if script.startswith('{"props"'):
-            page_data = json.loads(script)
-            break
-    if not page_data:
-        raise RuntimeError("Could not find store data on tacobell.ca")
-
-    stores = page_data["props"]["pageProps"]["data"]["chainStores"]["msg"]
-    locations = []
-    for store in stores:
-        store_id = store["id"]
-        title = store.get("title", {}).get("en_US", "Taco Bell")
-        addr = store.get("address", {})
-        lat_lng = addr.get("latLng", {})
-        locations.append(
-            {
-                "id": f"ca-{store_id[:8]}",
-                "storeNum": store_id[:8],
-                "name": title,
-                "address": addr.get("formatted", "").split(",")[0].strip(),
-                "city": addr.get("city", "").strip(),
-                "state": "",
-                "zip": "",
-                "country": "CA",
-                "lat": float(lat_lng["lat"]),
-                "lng": float(lat_lng["lng"]),
-                "phone": store.get("contact", {}).get("phone", "").strip(),
-            }
-        )
+    for feature in data.get("features", []):
+        loc = feature_to_location(feature)
+        if loc:
+            locations.append(loc)
     return locations
 
 
 def main() -> None:
-    print("Fetching US locations...")
-    us = parse_us_locations()
-    print(f"  {len(us)} US locations")
+    all_locations: list[dict] = []
+    country_counts: dict[str, int] = {}
 
-    print("Fetching UK locations...")
-    uk = parse_uk_locations()
-    print(f"  {len(uk)} UK locations")
+    for spider in SPIDERS:
+        country = SPIDER_COUNTRY[spider]
+        label = COUNTRY_NAMES.get(country, country)
+        print(f"Fetching {label} ({spider})...")
+        try:
+            locations = fetch_spider(spider)
+            locations = dedupe(locations)
+            print(f"  {len(locations)} locations")
+            country_counts[country] = country_counts.get(country, 0) + len(locations)
+            all_locations.extend(locations)
+        except Exception as exc:
+            print(f"  Failed: {exc}", file=sys.stderr)
 
-    print("Fetching Canada locations...")
-    ca = parse_ca_locations()
-    print(f"  {len(ca)} Canada locations")
-
-    all_locations = us + ca + uk
+    all_locations = dedupe(all_locations)
     all_locations.sort(key=lambda loc: (loc["country"], loc["state"], loc["city"], loc["name"]))
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "generated": date.today().isoformat(),
+        "source": "All The Places (alltheplaces.xyz)",
         "count": len(all_locations),
-        "countries": {
-            "US": len(us),
-            "CA": len(ca),
-            "GB": len(uk),
-        },
+        "countries": dict(sorted(country_counts.items(), key=lambda item: -item[1])),
         "locations": all_locations,
     }
     OUT.write_text(json.dumps(payload, separators=(",", ":")))
-    print(f"\nWrote {len(all_locations)} locations to {OUT}")
-    print(f"  File size: {OUT.stat().st_size / 1024 / 1024:.1f} MB")
+    print(f"\nWrote {len(all_locations)} locations across {len(country_counts)} countries")
+    print(f"  File: {OUT}")
+    print(f"  Size: {OUT.stat().st_size / 1024 / 1024:.1f} MB")
 
 
 if __name__ == "__main__":

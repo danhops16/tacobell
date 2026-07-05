@@ -56,7 +56,18 @@ function formatAddress(loc) {
 }
 
 function countryLabel(code) {
-  return { US: "United States", CA: "Canada", GB: "United Kingdom" }[code] || code;
+  const names = {
+    US: "United States",
+    CA: "Canada",
+    GB: "United Kingdom",
+    AU: "Australia",
+    ES: "Spain",
+    IN: "India",
+    NL: "Netherlands",
+    PH: "Philippines",
+    FI: "Finland",
+  };
+  return names[code] || code;
 }
 
 function applyFilters() {
