@@ -67,13 +67,16 @@
         <p class="sync-hint">Visited locations save in this browser. Export on one device and Import on another to sync.</p>
       </div>
 
-      <div class="location-panel" id="location-panel">
-        <button type="button" class="list-header" id="list-toggle" aria-expanded="false" aria-controls="location-list">
-          <span id="list-count">Loading...</span>
+      <details class="location-panel" id="location-panel">
+        <summary class="list-header" id="list-toggle">
+          <span class="list-toggle-text">
+            <span class="list-toggle-action" id="list-toggle-action">Show list</span>
+            <span class="list-toggle-count" id="list-count">Loading...</span>
+          </span>
           <span class="list-chevron" aria-hidden="true"></span>
-        </button>
+        </summary>
         <ul class="location-list" id="location-list"></ul>
-      </div>
+      </details>
     </aside>
 
     <section class="map-panel">
