@@ -64,12 +64,16 @@
             <input type="file" id="import-file" accept=".json" hidden>
           </label>
         </div>
+        <p class="sync-hint">Visited locations save in this browser. Export on one device and Import on another to sync.</p>
       </div>
 
-      <div class="list-header">
-        <span id="list-count">Loading...</span>
+      <div class="location-panel" id="location-panel">
+        <button type="button" class="list-header" id="list-toggle" aria-expanded="false" aria-controls="location-list">
+          <span id="list-count">Loading...</span>
+          <span class="list-chevron" aria-hidden="true"></span>
+        </button>
+        <ul class="location-list" id="location-list"></ul>
       </div>
-      <ul class="location-list" id="location-list"></ul>
     </aside>
 
     <section class="map-panel">
