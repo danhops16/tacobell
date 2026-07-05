@@ -149,10 +149,10 @@ function initMap() {
   }).addTo(map);
 }
 
-function createMarker(loc) {
+function markerIcon(loc) {
   const isVisited = visited.has(loc.id);
   const color = isVisited ? "#4ade80" : "#702283";
-  const icon = L.divIcon({
+  return L.divIcon({
     className: "custom-marker",
     html: `<div style="
       width:12px;height:12px;border-radius:50%;
@@ -162,8 +162,10 @@ function createMarker(loc) {
     iconSize: [12, 12],
     iconAnchor: [6, 6],
   });
+}
 
-  const marker = L.marker([loc.lat, loc.lng], { icon });
+function createMarker(loc) {
+  const marker = L.marker([loc.lat, loc.lng], { icon: markerIcon(loc) });
   marker.bindPopup(() => popupContent(loc));
   marker.on("click", () => {
     activeId = loc.id;
@@ -210,11 +212,9 @@ function updateMarkers() {
   allLocations.forEach((loc) => {
     const marker = markers[loc.id];
     if (!marker) return;
-    const isVisited = visited.has(loc.id);
-    const color = isVisited ? "#4ade80" : "#702283";
-    const el = marker.getElement()?.querySelector("div");
-    if (el) el.style.background = color;
+    marker.setIcon(markerIcon(loc));
   });
+  markerCluster?.refreshClusters();
 }
 
 function focusLocation(loc) {
