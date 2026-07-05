@@ -47,7 +47,24 @@ COUNTRY_NAMES = {
     "NL": "Netherlands",
     "PH": "Philippines",
     "FI": "Finland",
+    "JP": "Japan",
+    "BR": "Brazil",
+    "KR": "South Korea",
+    "TH": "Thailand",
+    "ID": "Indonesia",
+    "PT": "Portugal",
+    "CL": "Chile",
+    "SV": "El Salvador",
+    "GU": "Guam",
+    "BA": "Bosnia and Herzegovina",
+    "CY": "Cyprus",
+    "FR": "France",
+    "AR": "Argentina",
 }
+
+ATP_COUNTRIES = set(SPIDER_COUNTRY.values())
+# OpenStreetMap fills gaps for countries without an All The Places spider.
+OSM_COUNTRIES = ["JP", "BR", "KR", "TH", "ID", "PT", "CL", "SV", "GU", "BA", "CY", "FR", "AR"]
 
 
 def fetch(url: str) -> bytes:
@@ -151,9 +168,81 @@ def fetch_spider(spider: str) -> list[dict]:
     return locations
 
 
+def osm_element_to_location(element: dict, country: str) -> dict | None:
+    tags = element.get("tags", {})
+    lat = element.get("lat") or (element.get("center") or {}).get("lat")
+    lon = element.get("lon") or (element.get("center") or {}).get("lon")
+    if lat is None or lon is None:
+        return None
+
+    lat, lon = float(lat), float(lon)
+    ref = str(element.get("id", ""))
+    loc_id = make_id(country, ref, lat, lon)
+
+    address = tags.get("addr:full", "")
+    if not address and tags.get("addr:street"):
+        parts = [tags.get("addr:housenumber", ""), tags.get("addr:street", "")]
+        address = " ".join(p for p in parts if p).strip()
+
+    return {
+        "id": loc_id,
+        "storeNum": ref,
+        "name": tags.get("name") or tags.get("brand") or "Taco Bell",
+        "address": address,
+        "city": tags.get("addr:city", "").strip(),
+        "state": tags.get("addr:state", "").strip(),
+        "zip": tags.get("addr:postcode", "").strip(),
+        "country": country,
+        "lat": lat,
+        "lng": lon,
+        "phone": tags.get("phone", "").strip(),
+    }
+
+
+def fetch_osm_country(country: str) -> list[dict]:
+    import urllib.parse
+    import time
+
+    query = f'''[out:json][timeout:25];
+area["ISO3166-1"="{country}"]->.searchArea;
+(nwr["brand:wikidata"="Q752941"](area.searchArea););
+out center;'''
+    data = urllib.parse.urlencode({"data": query}).encode()
+    req = urllib.request.Request(
+        "https://overpass-api.de/api/interpreter",
+        data=data,
+        headers={"User-Agent": "tacobell-tracker/1.0"},
+    )
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        payload = json.loads(resp.read())
+
+    locations = []
+    for element in payload.get("elements", []):
+        loc = osm_element_to_location(element, country)
+        if loc:
+            locations.append(loc)
+    time.sleep(1)
+    return locations
+
+
+def fetch_osm_supplement() -> list[dict]:
+    locations = []
+    for country in OSM_COUNTRIES:
+        if country in ATP_COUNTRIES:
+            continue
+        label = COUNTRY_NAMES.get(country, country)
+        print(f"Fetching {label} from OpenStreetMap...")
+        try:
+            found = fetch_osm_country(country)
+            print(f"  {len(found)} locations")
+            locations.extend(found)
+        except Exception as exc:
+            print(f"  Failed: {exc}", file=sys.stderr)
+    return locations
+
+
 def main() -> None:
     all_locations: list[dict] = []
-    country_counts: dict[str, int] = {}
 
     for spider in SPIDERS:
         country = SPIDER_COUNTRY[spider]
@@ -163,18 +252,25 @@ def main() -> None:
             locations = fetch_spider(spider)
             locations = dedupe(locations)
             print(f"  {len(locations)} locations")
-            country_counts[country] = country_counts.get(country, 0) + len(locations)
             all_locations.extend(locations)
         except Exception as exc:
             print(f"  Failed: {exc}", file=sys.stderr)
 
+    print("\nSupplementing with OpenStreetMap for countries not in All The Places...")
+    oms_locations = fetch_osm_supplement()
+    all_locations.extend(oms_locations)
+
     all_locations = dedupe(all_locations)
+    country_counts: dict[str, int] = {}
+    for loc in all_locations:
+        country_counts[loc["country"]] = country_counts.get(loc["country"], 0) + 1
+
     all_locations.sort(key=lambda loc: (loc["country"], loc["state"], loc["city"], loc["name"]))
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "generated": date.today().isoformat(),
-        "source": "All The Places (alltheplaces.xyz)",
+        "source": "All The Places + OpenStreetMap",
         "count": len(all_locations),
         "countries": dict(sorted(country_counts.items(), key=lambda item: -item[1])),
         "locations": all_locations,

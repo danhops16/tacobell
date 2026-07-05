@@ -66,6 +66,19 @@ function countryLabel(code) {
     NL: "Netherlands",
     PH: "Philippines",
     FI: "Finland",
+    JP: "Japan",
+    BR: "Brazil",
+    KR: "South Korea",
+    TH: "Thailand",
+    ID: "Indonesia",
+    PT: "Portugal",
+    CL: "Chile",
+    SV: "El Salvador",
+    GU: "Guam",
+    BA: "Bosnia and Herzegovina",
+    CY: "Cyprus",
+    FR: "France",
+    AR: "Argentina",
   };
   return names[code] || code;
 }
