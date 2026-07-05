@@ -109,7 +109,18 @@ function applyFilters() {
 
   listOffset = 0;
   renderList();
-  $("#list-count").textContent = `${filteredLocations.length.toLocaleString()} locations`;
+  updateListToggleLabel();
+}
+
+function updateListToggleLabel() {
+  const count = filteredLocations.length.toLocaleString();
+  const panel = $("#location-panel");
+  if (isMobileLayout()) {
+    $("#list-count").textContent = `(${count})`;
+    $("#list-toggle-action").textContent = panel.open ? "Hide list" : "Show list";
+  } else {
+    $("#list-count").textContent = `${count} locations`;
+  }
 }
 
 function renderList() {
@@ -230,7 +241,7 @@ function focusLocation(loc) {
   markers[loc.id]?.openPopup();
   renderList();
   if (isMobileLayout()) {
-    setLocationPanelCollapsed(true);
+    setLocationPanelOpen(false);
   } else {
     scrollToItem(loc.id);
   }
@@ -257,11 +268,12 @@ function isMobileLayout() {
   return window.matchMedia("(max-width: 768px)").matches;
 }
 
-function setLocationPanelCollapsed(collapsed) {
+function setLocationPanelOpen(open) {
   const panel = $("#location-panel");
-  const toggle = $("#list-toggle");
-  panel.classList.toggle("collapsed", collapsed);
-  toggle.setAttribute("aria-expanded", String(!collapsed));
+  const sidebar = panel.closest(".sidebar");
+  panel.open = open;
+  sidebar?.classList.toggle("list-open", open);
+  updateListToggleLabel();
   if (map) {
     requestAnimationFrame(() => map.invalidateSize());
   }
@@ -269,25 +281,34 @@ function setLocationPanelCollapsed(collapsed) {
 
 function setupLocationPanel() {
   const panel = $("#location-panel");
-  const toggle = $("#list-toggle");
+  const sidebar = panel.closest(".sidebar");
 
   if (isMobileLayout()) {
-    panel.classList.add("collapsed");
-    toggle.setAttribute("aria-expanded", "false");
+    panel.open = false;
+    sidebar?.classList.remove("list-open");
   } else {
-    toggle.setAttribute("aria-expanded", "true");
+    panel.open = true;
+    sidebar?.classList.remove("list-open");
   }
+  updateListToggleLabel();
 
-  toggle.addEventListener("click", () => {
+  panel.addEventListener("toggle", () => {
     if (!isMobileLayout()) return;
-    setLocationPanelCollapsed(!panel.classList.contains("collapsed"));
+    sidebar?.classList.toggle("list-open", panel.open);
+    updateListToggleLabel();
+    map?.invalidateSize();
+  });
+
+  panel.querySelector(".list-header")?.addEventListener("click", (e) => {
+    if (!isMobileLayout()) e.preventDefault();
   });
 
   window.addEventListener("resize", debounce(() => {
     if (!isMobileLayout()) {
-      panel.classList.remove("collapsed");
-      toggle.setAttribute("aria-expanded", "true");
+      panel.open = true;
+      sidebar?.classList.remove("list-open");
     }
+    updateListToggleLabel();
     map?.invalidateSize();
   }, 150));
 }
