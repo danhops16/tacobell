@@ -270,9 +270,7 @@ function isMobileLayout() {
 
 function setLocationPanelOpen(open) {
   const panel = $("#location-panel");
-  const sidebar = panel.closest(".sidebar");
   panel.open = open;
-  sidebar?.classList.toggle("list-open", open);
   updateListToggleLabel();
   if (map) {
     requestAnimationFrame(() => map.invalidateSize());
@@ -281,20 +279,16 @@ function setLocationPanelOpen(open) {
 
 function setupLocationPanel() {
   const panel = $("#location-panel");
-  const sidebar = panel.closest(".sidebar");
 
   if (isMobileLayout()) {
     panel.open = false;
-    sidebar?.classList.remove("list-open");
   } else {
     panel.open = true;
-    sidebar?.classList.remove("list-open");
   }
   updateListToggleLabel();
 
   panel.addEventListener("toggle", () => {
     if (!isMobileLayout()) return;
-    sidebar?.classList.toggle("list-open", panel.open);
     updateListToggleLabel();
     map?.invalidateSize();
   });
@@ -306,7 +300,6 @@ function setupLocationPanel() {
   window.addEventListener("resize", debounce(() => {
     if (!isMobileLayout()) {
       panel.open = true;
-      sidebar?.classList.remove("list-open");
     }
     updateListToggleLabel();
     map?.invalidateSize();
