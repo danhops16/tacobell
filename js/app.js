@@ -52,7 +52,13 @@ function formatAddress(loc) {
   const parts = [loc.address, loc.city];
   if (loc.state) parts.push(loc.state);
   if (loc.zip) parts.push(loc.zip);
-  return parts.filter(Boolean).join(", ");
+  const formatted = parts.filter(Boolean).join(", ");
+  if (formatted) return formatted;
+  return `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`;
+}
+
+function mapsUrl(loc) {
+  return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`;
 }
 
 function countryLabel(code) {
@@ -182,6 +188,7 @@ function popupContent(loc) {
   div.innerHTML = `
     <h3>${escapeHtml(loc.name)}</h3>
     <p>${escapeHtml(formatAddress(loc))}</p>
+    <p><a href="${mapsUrl(loc)}" target="_blank" rel="noopener">Open in Google Maps</a></p>
     <button type="button" class="popup-btn mark${isVisited ? " visited" : ""}">
       ${isVisited ? "✓ Visited" : "Mark as visited"}
     </button>`;

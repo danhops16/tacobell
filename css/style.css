@@ -336,6 +336,11 @@ html, body {
   margin-bottom: 0.5rem;
 }
 
+.popup-content a {
+  color: var(--yellow);
+  font-size: 0.8rem;
+}
+
 .popup-btn {
   width: 100%;
   padding: 0.4rem;

@@ -241,6 +241,64 @@ def fetch_osm_supplement() -> list[dict]:
     return locations
 
 
+def fill_missing_addresses(locations: list[dict]) -> int:
+    import time
+    import urllib.parse
+
+    filled = 0
+    missing = [
+        loc for loc in locations
+        if not (loc.get("address") or "").strip() or not (loc.get("city") or "").strip()
+    ]
+    if not missing:
+        return 0
+
+    print(f"\nReverse-geocoding {len(missing)} locations missing address data...")
+    for loc in missing:
+        try:
+            url = (
+                "https://nominatim.openstreetmap.org/reverse?"
+                + urllib.parse.urlencode({
+                    "lat": loc["lat"],
+                    "lon": loc["lng"],
+                    "format": "json",
+                    "addressdetails": 1,
+                })
+            )
+            req = urllib.request.Request(url, headers={"User-Agent": "tacobell-tracker/1.0"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read())
+
+            addr = data.get("address", {})
+            road = addr.get("road") or addr.get("pedestrian") or addr.get("footway") or ""
+            house = addr.get("house_number", "")
+            street = f"{house} {road}".strip() if house else road
+            city = (
+                addr.get("city")
+                or addr.get("town")
+                or addr.get("village")
+                or addr.get("municipality")
+                or addr.get("county")
+                or ""
+            )
+
+            if street and not loc.get("address"):
+                loc["address"] = street
+            if city and not loc.get("city"):
+                loc["city"] = city
+            if not loc.get("state"):
+                loc["state"] = (addr.get("state") or addr.get("region") or "").strip()
+            if not loc.get("zip"):
+                loc["zip"] = (addr.get("postcode") or "").strip()
+            filled += 1
+            print(f"  {loc['country']}: {street or city or 'resolved'}")
+        except Exception as exc:
+            print(f"  Failed {loc['id']}: {exc}", file=sys.stderr)
+        time.sleep(1.1)
+
+    return filled
+
+
 def main() -> None:
     all_locations: list[dict] = []
 
@@ -261,6 +319,7 @@ def main() -> None:
     all_locations.extend(oms_locations)
 
     all_locations = dedupe(all_locations)
+    fill_missing_addresses(all_locations)
     country_counts: dict[str, int] = {}
     for loc in all_locations:
         country_counts[loc["country"]] = country_counts.get(loc["country"], 0) + 1
