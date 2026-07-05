@@ -412,33 +412,46 @@ body {
 @media (max-width: 768px) {
   .main {
     flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    min-width: 0;
-    flex-shrink: 0;
-    max-height: none;
     overflow: hidden;
   }
 
-  .sidebar.list-open {
-    flex: 0 1 52%;
-    min-height: 0;
+  /* Flatten sidebar so we can reorder: controls → map → list */
+  .sidebar {
+    display: contents;
   }
 
   .controls {
+    order: 1;
     flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .map-panel {
+    order: 2;
+    flex: 1;
+    min-height: 0;
+    z-index: 0;
+  }
+
+  .main:has(.location-panel[open]) .map-panel {
+    flex: 0 0 38%;
+    min-height: 160px;
   }
 
   .location-panel {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    order: 3;
+    flex: 0 0 auto;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 1;
   }
 
-  .location-panel:not([open]) {
-    flex: 0 0 auto;
+  .location-panel[open] {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .list-header {
@@ -447,7 +460,7 @@ body {
     font-size: 0.9rem;
     color: var(--text);
     background: var(--bg);
-    border-top: 1px solid var(--border);
+    border-top: none;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
@@ -492,12 +505,6 @@ body {
     min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-  }
-
-  .map-panel {
-    flex: 1;
-    min-height: 0;
-    height: auto;
   }
 
   .stats {
