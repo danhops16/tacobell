@@ -229,7 +229,11 @@ function focusLocation(loc) {
   map.setView([loc.lat, loc.lng], 15);
   markers[loc.id]?.openPopup();
   renderList();
-  scrollToItem(loc.id);
+  if (isMobileLayout()) {
+    setLocationPanelCollapsed(true);
+  } else {
+    scrollToItem(loc.id);
+  }
 }
 
 function scrollToItem(id) {
@@ -249,7 +253,48 @@ function populateCountryFilter(countries) {
     });
 }
 
+function isMobileLayout() {
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
+function setLocationPanelCollapsed(collapsed) {
+  const panel = $("#location-panel");
+  const toggle = $("#list-toggle");
+  panel.classList.toggle("collapsed", collapsed);
+  toggle.setAttribute("aria-expanded", String(!collapsed));
+  if (map) {
+    requestAnimationFrame(() => map.invalidateSize());
+  }
+}
+
+function setupLocationPanel() {
+  const panel = $("#location-panel");
+  const toggle = $("#list-toggle");
+
+  if (isMobileLayout()) {
+    panel.classList.add("collapsed");
+    toggle.setAttribute("aria-expanded", "false");
+  } else {
+    toggle.setAttribute("aria-expanded", "true");
+  }
+
+  toggle.addEventListener("click", () => {
+    if (!isMobileLayout()) return;
+    setLocationPanelCollapsed(!panel.classList.contains("collapsed"));
+  });
+
+  window.addEventListener("resize", debounce(() => {
+    if (!isMobileLayout()) {
+      panel.classList.remove("collapsed");
+      toggle.setAttribute("aria-expanded", "true");
+    }
+    map?.invalidateSize();
+  }, 150));
+}
+
 function setupEvents() {
+  setupLocationPanel();
+
   $("#search").addEventListener("input", debounce(applyFilters, 200));
   $("#country-filter").addEventListener("change", applyFilters);
   $("#status-filter").addEventListener("change", applyFilters);
@@ -368,6 +413,9 @@ async function init() {
   }
 
   $("#loading").classList.add("hidden");
+  if (isMobileLayout() && map) {
+    requestAnimationFrame(() => map.invalidateSize());
+  }
 }
 
 init();
