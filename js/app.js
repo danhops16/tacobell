@@ -57,8 +57,22 @@ function formatAddress(loc) {
   return `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`;
 }
 
-function mapsUrl(loc) {
+function googleMapsUrl(loc) {
   return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`;
+}
+
+function appleMapsUrl(loc) {
+  const label = encodeURIComponent(loc.name || formatAddress(loc));
+  return `https://maps.apple.com/?ll=${loc.lat},${loc.lng}&q=${label}`;
+}
+
+function mapsLinksHtml(loc) {
+  return `
+    <p class="popup-maps-links">
+      <a href="${googleMapsUrl(loc)}" target="_blank" rel="noopener">Google Maps</a>
+      <span class="popup-maps-sep" aria-hidden="true">·</span>
+      <a href="${appleMapsUrl(loc)}" target="_blank" rel="noopener">Apple Maps</a>
+    </p>`;
 }
 
 function countryLabel(code) {
@@ -199,7 +213,7 @@ function popupContent(loc) {
   div.innerHTML = `
     <h3>${escapeHtml(loc.name)}</h3>
     <p>${escapeHtml(formatAddress(loc))}</p>
-    <p><a href="${mapsUrl(loc)}" target="_blank" rel="noopener">Open in Google Maps</a></p>
+    ${mapsLinksHtml(loc)}
     <button type="button" class="popup-btn mark${isVisited ? " visited" : ""}">
       ${isVisited ? "✓ Visited" : "Mark as visited"}
     </button>`;
