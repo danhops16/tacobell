@@ -1,0 +1,495 @@
+{
+  "generated_from_csv": "/Users/peted/projects/tacobell/exports/all-tacobell-locations.csv",
+  "countries_in_csv": [
+    "AU",
+    "BR",
+    "CA",
+    "CY",
+    "ES",
+    "FI",
+    "FR",
+    "GB",
+    "GU",
+    "ID",
+    "IN",
+    "JP",
+    "NL",
+    "PH",
+    "PT",
+    "TH",
+    "US"
+  ],
+  "countries_in_csv_count": 17,
+  "likely_missing_countries": [
+    "MY",
+    "CL",
+    "PE",
+    "CO",
+    "CR",
+    "PA",
+    "GT",
+    "DO",
+    "OM",
+    "KW",
+    "SA"
+  ],
+  "countries": {
+    "US": {
+      "country": "US",
+      "name": "United States",
+      "in_csv": true,
+      "csv_count": 8238,
+      "official_sources": [
+        {
+          "name": "Taco Bell US Store Locator",
+          "url": "https://locations.tacobell.com/",
+          "type": "sitemap",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_us"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "CA": {
+      "country": "CA",
+      "name": "Canada",
+      "in_csv": true,
+      "csv_count": 200,
+      "official_sources": [
+        {
+          "name": "Taco Bell Canada Store Locator",
+          "url": "https://www.tacobell.ca/en/store-locator",
+          "type": "embedded_json",
+          "scraper": "ca_store_locator"
+        },
+        {
+          "name": "Taco Bell Canada Locations Sitemap",
+          "url": "https://locations.tacobell.ca/sitemap.xml",
+          "type": "sitemap",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_ca"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "GB": {
+      "country": "GB",
+      "name": "United Kingdom",
+      "in_csv": true,
+      "csv_count": 164,
+      "official_sources": [
+        {
+          "name": "Taco Bell UK Uberall Store Finder",
+          "url": "https://www.tacobell.co.uk/restaurants",
+          "type": "api",
+          "scraper": "uberall_gb"
+        },
+        {
+          "name": "ATP Taco Bell UK",
+          "url": "https://data.alltheplaces.xyz/runs/latest/output/taco_bell_gb.geojson",
+          "type": "geojson",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_gb"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "ES": {
+      "country": "ES",
+      "name": "Spain",
+      "in_csv": true,
+      "csv_count": 179,
+      "official_sources": [
+        {
+          "name": "Taco Bell Spain Store API",
+          "url": "https://loyalty-customer-api.pro.tacobell.es/public/store/list",
+          "type": "api",
+          "scraper": "es_api"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "AU": {
+      "country": "AU",
+      "name": "Australia",
+      "in_csv": true,
+      "csv_count": 28,
+      "official_sources": [
+        {
+          "name": "Taco Bell Australia Locations",
+          "url": "https://tacobell.com.au/order-now-locations/",
+          "type": "html",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_au"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "IN": {
+      "country": "IN",
+      "name": "India",
+      "in_csv": true,
+      "csv_count": 111,
+      "official_sources": [
+        {
+          "name": "Taco Bell India Find Us",
+          "url": "https://www.tacobell.co.in/find-us",
+          "type": "html",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_in"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "NL": {
+      "country": "NL",
+      "name": "Netherlands",
+      "in_csv": true,
+      "csv_count": 1,
+      "official_sources": [
+        {
+          "name": "Taco Bell Netherlands Locations",
+          "url": "https://tacobell.nl/en/locations/",
+          "type": "html",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_nl"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "PH": {
+      "country": "PH",
+      "name": "Philippines",
+      "in_csv": true,
+      "csv_count": 11,
+      "official_sources": [
+        {
+          "name": "Taco Bell Philippines Locations",
+          "url": "https://tacobell.com.ph/locations/",
+          "type": "html",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_ph"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "FI": {
+      "country": "FI",
+      "name": "Finland",
+      "in_csv": true,
+      "csv_count": 19,
+      "official_sources": [
+        {
+          "name": "Taco Bell Finland Restaurants",
+          "url": "https://tacobell.fi/ravintolat/",
+          "type": "html",
+          "scraper": "atp_geojson",
+          "spider": "taco_bell_fi"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "MY": {
+      "country": "MY",
+      "name": "Malaysia",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Malaysia Locations",
+          "url": "https://tacobell.com.my/locations/",
+          "type": "html",
+          "scraper": "my_locations"
+        }
+      ],
+      "status": "blocked",
+      "notes": "Cloudflare protection observed during probing; scraper may fail without browser automation.",
+      "source_checks": []
+    },
+    "TH": {
+      "country": "TH",
+      "name": "Thailand",
+      "in_csv": true,
+      "csv_count": 6,
+      "official_sources": [
+        {
+          "name": "Taco Bell Thailand",
+          "url": "https://tacobell.co.th/",
+          "type": "html",
+          "scraper": "th_locations"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "CL": {
+      "country": "CL",
+      "name": "Chile",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Chile",
+          "url": "https://www.tacobell.cl/",
+          "type": "embedded_json",
+          "scraper": "cl_getjusto"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "PE": {
+      "country": "PE",
+      "name": "Peru",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Peru",
+          "url": "https://tacobell.com.pe/",
+          "type": "embedded_json",
+          "scraper": "pe_getjusto"
+        }
+      ],
+      "status": "active",
+      "notes": "",
+      "source_checks": []
+    },
+    "CO": {
+      "country": "CO",
+      "name": "Colombia",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Colombia",
+          "url": "https://tacobell.com.co/",
+          "type": "html",
+          "scraper": "co_locations"
+        }
+      ],
+      "status": "blocked",
+      "notes": "",
+      "source_checks": []
+    },
+    "CR": {
+      "country": "CR",
+      "name": "Costa Rica",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Costa Rica",
+          "url": "https://tacobell.cr/",
+          "type": "html",
+          "scraper": "cr_locations"
+        }
+      ],
+      "status": "blocked",
+      "notes": "",
+      "source_checks": []
+    },
+    "PA": {
+      "country": "PA",
+      "name": "Panama",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Panama",
+          "url": "https://tacobell.com.pa/",
+          "type": "html",
+          "scraper": "pa_locations"
+        }
+      ],
+      "status": "blocked",
+      "notes": "",
+      "source_checks": []
+    },
+    "GT": {
+      "country": "GT",
+      "name": "Guatemala",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Guatemala",
+          "url": "https://tacobell.com.gt/",
+          "type": "html",
+          "scraper": "gt_locations"
+        }
+      ],
+      "status": "unknown",
+      "notes": "",
+      "source_checks": []
+    },
+    "DO": {
+      "country": "DO",
+      "name": "Dominican Republic",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Dominican Republic",
+          "url": "https://tacobell.com.do/",
+          "type": "html",
+          "scraper": "do_locations"
+        }
+      ],
+      "status": "unknown",
+      "notes": "",
+      "source_checks": []
+    },
+    "KR": {
+      "country": "KR",
+      "name": "South Korea",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [],
+      "status": "unavailable",
+      "notes": "No official Taco Bell Korea locator URL found during research.",
+      "source_checks": []
+    },
+    "MX": {
+      "country": "MX",
+      "name": "Mexico",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [],
+      "status": "no_official_locations",
+      "notes": "Taco Bell previously operated in Mexico but closed all locations; no official locator.",
+      "source_checks": []
+    },
+    "RO": {
+      "country": "RO",
+      "name": "Romania",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Romania",
+          "url": "https://tacobell.ro/",
+          "type": "html",
+          "scraper": "ro_locations"
+        }
+      ],
+      "status": "unavailable",
+      "notes": "Domain appears parked/unavailable.",
+      "source_checks": []
+    },
+    "SE": {
+      "country": "SE",
+      "name": "Sweden",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell Sweden",
+          "url": "https://tacobell.se/en/locations/",
+          "type": "html",
+          "scraper": "se_locations"
+        }
+      ],
+      "status": "unavailable",
+      "notes": "Domain appears parked/unavailable.",
+      "source_checks": []
+    },
+    "AE": {
+      "country": "AE",
+      "name": "United Arab Emirates",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [
+        {
+          "name": "Taco Bell UAE",
+          "url": "https://tacobell.ae/locations/",
+          "type": "html",
+          "scraper": "ae_locations"
+        }
+      ],
+      "status": "unavailable",
+      "notes": "",
+      "source_checks": []
+    },
+    "OM": {
+      "country": "OM",
+      "name": "Oman",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [],
+      "status": "unknown",
+      "notes": "No official locator URL confirmed.",
+      "source_checks": []
+    },
+    "KW": {
+      "country": "KW",
+      "name": "Kuwait",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [],
+      "status": "unknown",
+      "notes": "No official locator URL confirmed.",
+      "source_checks": []
+    },
+    "SA": {
+      "country": "SA",
+      "name": "Saudi Arabia",
+      "in_csv": false,
+      "csv_count": 0,
+      "official_sources": [],
+      "status": "unknown",
+      "notes": "No official locator URL confirmed.",
+      "source_checks": []
+    },
+    "JP": {
+      "country": "JP",
+      "name": "Japan",
+      "in_csv": true,
+      "csv_count": 9,
+      "official_sources": [],
+      "status": "osm_only",
+      "notes": "Current CSV uses OpenStreetMap supplement; no stable official locator confirmed.",
+      "source_checks": []
+    },
+    "BR": {
+      "country": "BR",
+      "name": "Brazil",
+      "in_csv": true,
+      "csv_count": 7,
+      "official_sources": [],
+      "status": "osm_only",
+      "notes": "Current CSV uses OpenStreetMap supplement; no stable official locator confirmed.",
+      "source_checks": []
+    },
+    "PT": {
+      "country": "PT",
+      "name": "Portugal",
+      "in_csv": true,
+      "csv_count": 24,
+      "official_sources": [],
+      "status": "osm_only",
+      "notes": "Current CSV uses OpenStreetMap supplement; no stable official locator confirmed.",
+      "source_checks": []
+    }
+  }
+}
